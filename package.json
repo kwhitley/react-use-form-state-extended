@@ -1,15 +1,12 @@
 {
-  "name": "use-store-hook",
-  "version": "1.4.0",
-  "description": "Shared, persistable React.js useState() hook effect, no context required",
+  "name": "react-use-form-state-extended",
+  "version": "0.1.0",
+  "description": "react-use-form-state, but extended!",
   "keywords": [
     "react",
     "hooks",
-    "store",
-    "useState",
-    "useStore",
-    "localStorage",
-    "persist"
+    "form",
+    "state"
   ],
   "main": "index.js",
   "target": "esnext",
@@ -27,11 +24,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kwhitley/use-store.git"
+    "url": "https://github.com/kwhitley/react-use-form-state-extended.git"
   },
   "bugs": {
-    "url": "https://github.com/kwhitley/use-store/issues",
-    "email": "support@arundo.com"
+    "url": "https://github.com/kwhitley/react-use-form-state-extended/issues",
+    "email": "krwhitley@gmail.com"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
@@ -50,6 +47,6 @@
     "react": "^16.8.0"
   },
   "dependencies": {
-    "localstorify": "^0.2.2"
+    "react-use-form-state": "^0.10.2"
   }
 }

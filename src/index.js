@@ -1,82 +1,50 @@
 import { useState, useEffect } from 'react'
-import localstorify from 'localstorify'
+import { useFormState as ufs } from 'react-use-form-state'
 
-// prefix for localstorify
-const GLOBALSTORAGE_PREFIX = '!ush::'
-
-// individual Store implementation for tracking values/setters
-export class Store {
-  constructor({ value, namespace, options }) {
-    this.state = value
-
-    if (options.persist) {
-      try {
-        let stored = localstorify.getItem(GLOBALSTORAGE_PREFIX + namespace)
-        if (stored !== null) {
-          this.state = JSON.parse(stored)
-        }
-      } catch(err) {
-
-      }
+const onlyChanges = original => item => {
+  const changes = Object.keys(item).reduce((final, k) => {
+    if (original[k] !== item[k]) {
+      final[k] = item[k]
     }
 
-    this.options = options
-    this.namespace = namespace
-    this.setters = []
-  }
+    return final
+  }, {})
 
-  setState = (value) => {
-    this.state = value
-    if (this.options.persist) {
-      localstorify.setItem(GLOBALSTORAGE_PREFIX + this.namespace, JSON.stringify(value))
-    }
-    this.setters.forEach(setter => setter(this.state))
+  const hasChanges = Boolean(Object.keys(changes).length)
+
+  return {
+    changes: hasChanges ? changes : undefined,
+    hasChanges,
   }
 }
 
-// namespaced index of requested Stores
-export class GlobalStore {
-  set = (namespace, value, options = {}) => {
-    if (this.hasOwnProperty(namespace)) {
-      this[namespace].setState(value)
-    } else {
-      this[namespace] = new Store({ value, options, namespace })
-    }
-  }
+export const useFormState = (original) => {
+  let formState = ufs(original)
+  let [ state, controls ] = formState
+  let [ meta, setMeta ] = useState({
+    numberOfErrors: 0,
+    hasErrors: false,
+    hasChanges: false,
+    onlyChanges: undefined,
+    isValid: false,
+  })
 
-  clear = (namespace) => {
-    localstorify.removeItem(GLOBALSTORAGE_PREFIX + namespace)
-  }
+  const changesFromOriginal = onlyChanges(original)
 
-  persist = (...args) => this.set(...args, { persist: true })
-}
+  useEffect(() => {
+    let { changes, hasChanges } = changesFromOriginal(state.values)
+    let numberOfErrors = Object.keys(state.errors).length
+    let hasErrors = numberOfErrors !== 0
+    let isValid = !Object.values(state.validity).includes(false)
 
-// shared instantiation of GlobalStore
-export const globalStore = new GlobalStore()
+    setMeta({
+      numberOfErrors,
+      hasErrors,
+      changes,
+      hasChanges,
+      isValid,
+    })
+  }, [state.values])
 
-// the actual hook
-export function useStore(namespace, value, options = {}) {
-  let whichStore = undefined
-
-  if (!namespace) {
-    throw new Error('no namespace provided to useStore... try using useState() instead?')
-  }
-
-  if (globalStore.hasOwnProperty(namespace)) {
-    whichStore = globalStore[namespace]
-  } else {
-    whichStore = globalStore[namespace] = new Store({ value, options, namespace })
-  }
-
-  const [ state, set ] = useState(whichStore.state)
-
-  if (!whichStore.setters.includes(set)) {
-    whichStore.setters.push(set)
-  }
-
-  useEffect(() => () => {
-    whichStore.setters = whichStore.setters.filter(setter => setter !== set)
-  }, [])
-
-  return [ state, whichStore.setState ]
+  return [ { ...state, ...meta }, controls ]
 }

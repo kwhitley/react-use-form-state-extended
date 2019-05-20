@@ -1,47 +1,89 @@
 import { renderHook, cleanup, act, unmount } from 'react-hooks-testing-library'
 
 // test files
-import { useStore } from '../src/index.js'
+import { useFormState } from '../src/index.js'
 
 const VALUE = 0
 const SETTER = 1
 
-describe('@kwhitley/use-store', () => {
-  describe('useStore(namespace:string, initialValue:anything, options:object) : function', () => {
-    test('exports via { useStore } named export', () => {
-      expect(typeof useStore).toBe('function')
+describe('react-use-form-state-extended', () => {
+  describe('useFormState()', () => {
+    let defaultForm = { email: '' }
+
+    test('exports via { useFormState } named export', () => {
+      expect(typeof useFormState).toBe('function')
     })
 
-    test('initializes value to initialValue', () => {
-      const { result } = renderHook(() => useStore('test1', 1))
+    describe('.isValid [boolean]', () => {
+      test('defaults to true', () => {
+        const { result } = renderHook(() => useFormState(defaultForm))
+        let [ form ] = result.current
 
-      expect(result.current[VALUE]).toBe(1)
+        expect(form.isValid).toBe(true)
+      })
     })
 
-    test('setValue can change the value', () => {
-      const { result } = renderHook(() => useStore('test1', 1))
+    describe('.numberOfErrors [number]', () => {
+      test('defaults to 0', () => {
+        const { result } = renderHook(() => useFormState(defaultForm))
+        let [ form ] = result.current
 
-      act(() => result.current[SETTER](result.current[VALUE] + 1))
-
-      expect(result.current[VALUE]).toBe(2)
+        expect(form.numberOfErrors).toBe(0)
+      })
     })
 
-    test('hook is shared across functional scopes', () => {
-      const { result } = renderHook(() => useStore('test1', 1)) // initialize to 1
+    describe('.hasErrors [boolean]', () => {
+      test('defaults to false', () => {
+        const { result } = renderHook(() => useFormState(defaultForm))
+        let [ form ] = result.current
 
-      expect(result.current[VALUE]).toBe(2) // but expect 2 from previous test
+        expect(form.hasErrors).toBe(false)
+      })
+
+      test('returns true if any errors', () => {
+        const { result } = renderHook(() => useFormState(defaultForm))
+        let [ form ] = result.current
+
+        act(() => form.setField('email', 'foo'))
+
+        expect(result.current[0].hasErrors).toBe(true)
+      })
     })
 
-    test('hook is shared across functional scopes', () => {
-      const { result } = renderHook(() => useStore('test1', 1)) // initialize to 1
+    describe('.hasChanges [boolean]', () => {
+      test('defaults to false', () => {
+        const { result } = renderHook(() => useFormState(defaultForm))
+        let [ form ] = result.current
 
-      expect(result.current[VALUE]).toBe(2) // but expect 2 from previous test
+        expect(form.hasChanges).toBe(false)
+      })
+
+      test('returns true if any changes', () => {
+        const { result } = renderHook(() => useFormState(defaultForm))
+        let [ form ] = result.current
+
+        act(() => form.setField('email', 'foo'))
+
+        expect(result.current[0].hasChanges).toBe(true)
+      })
     })
 
-    test('using persist: true does not break', () => {
-      const { result } = renderHook(() => useStore('test2', 1, { persist: true })) // initialize to 1
+    describe('.changes [object | undefined]', () => {
+      test('defaults to undefined', () => {
+        const { result } = renderHook(() => useFormState(defaultForm))
+        let [ form ] = result.current
 
-      expect(result.current[VALUE]).toBe(1) // but expect 2 from previous test
+        expect(form.changes).toBe(undefined)
+      })
+
+      test('returns a change object with any changes', () => {
+        const { result } = renderHook(() => useFormState(defaultForm))
+        let [ form ] = result.current
+
+        act(() => form.setField('email', 'foo'))
+
+        expect(result.current[0].changes).toEqual({ email : 'foo' })
+      })
     })
   })
 })
