@@ -1,5 +1,6 @@
-react-use-form-state
-##### (with extended meta information)
+# react-use-form-state
+#### (but with built-in helpers)
+---
 
 # Why?
 Because `react-use-form-state` is an *incredibly* elegant form handling hook library for React, but lacks a few quality of life adjustments I'd like to see.
