@@ -1,6 +1,6 @@
 {
   "name": "react-use-form-state-extended",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "react-use-form-state, but extended!",
   "keywords": [
     "react",
@@ -47,6 +47,6 @@
     "react": "^16.8.0"
   },
   "dependencies": {
-    "react-use-form-state": "^0.10.2"
+    "react-use-form-state": "^0.10.4"
   }
 }
