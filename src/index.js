@@ -18,6 +18,17 @@ const onlyChanges = original => item => {
   }
 }
 
+export const useHash = (...args) => {
+  let [ key, setKey ] = useState(Math.random())
+
+  // regenerate key whenever args change
+  useEffect(() => {
+    setKey(Math.random())
+  }, args)
+
+  return { key }
+}
+
 export const useFormState = (original) => {
   let formState = ufs(original)
   let [ state, controls ] = formState

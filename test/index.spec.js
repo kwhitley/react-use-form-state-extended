@@ -1,12 +1,20 @@
 import { renderHook, cleanup, act, unmount } from 'react-hooks-testing-library'
 
 // test files
-import { useFormState } from '../src/index.js'
+import { useFormState, useHash } from '../src/index.js'
 
 const VALUE = 0
 const SETTER = 1
 
 describe('react-use-form-state-extended', () => {
+  describe('useHash()', () => {
+    let defaultForm = { email: '' }
+
+    test('exports via { useHash } named export', () => {
+      expect(typeof useHash).toBe('function')
+    })
+  })
+
   describe('useFormState()', () => {
     let defaultForm = { email: '' }
 
